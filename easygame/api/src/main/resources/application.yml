@@ -1,0 +1,56 @@
+server:
+  port: 8080
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    url: jdbc:mysql://localhost:3306/easygame?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: passQwe321!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 3
+      auto-commit: true
+      #ms
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        type: trace
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    com.easygame: DEBUG
+
+springdoc:
+  api-docs:
+    path: /docs/v1
+    groups:
+      enabled: true
+
+  swagger-ui:   # ✅ 반드시 springdoc 바로 하위에 위치해야 함!
+    path: /easygame-api-ui.html
+    url: /docs/v1/easygame-openapi
+    enabled: true
+    groups-order: ASC
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+  cache:
+    disabled: true
+  model-and-view-allowed: true

@@ -1,0 +1,57 @@
+plugins {
+    id 'org.springframework.boot' version '3.4.4' apply false
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+}
+
+group = 'com.easygame'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    google()
+    gradlePluginPortal()
+}
+
+java {
+    sourceCompatibility = '23'
+}
+
+subprojects {
+    group = 'com.easygame'
+    version = '1.0-SNAPSHOT'
+
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    sourceCompatibility = '23'
+
+    repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+    }
+
+    dependencies {
+        compileOnly 'org.projectlombok:lombok:1.18.38'
+        annotationProcessor 'org.projectlombok:lombok:1.18.38'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test:3.4.4'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.2'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(23)
+        }
+    }
+}

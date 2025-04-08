@@ -10,6 +10,7 @@ public enum ErrorCode {
     INVALID_REQUEST("Invalid Request", HttpStatus.BAD_REQUEST),
     INVALID_TOKEN("Illegal Access", HttpStatus.UNAUTHORIZED),
     NOT_FOUND("Not Found", HttpStatus.NOT_FOUND),
+    DUPLICATE_USER("Already exist", HttpStatus.BAD_REQUEST),
     INTERNAL_ERROR("Unexpected Error", HttpStatus.INTERNAL_SERVER_ERROR);
 
   private String message;

@@ -4,7 +4,6 @@ import com.easygame.repository.type.GameType;
 import com.easygame.service.dto.GameScoreDto;
 import com.easygame.service.dto.UserDto;
 import com.easygame.service.exception.InvalidTokenException;
-import com.easygame.service.exception.NotFoundException;
 import com.easygame.service.mapper.GameScoreMapper;
 import com.easygame.repository.GameScore;
 import com.easygame.repository.GameScoreRepository;
@@ -66,27 +65,30 @@ public class GameScoreService {
         );
     }
 
+    // When multiple players have the same score, the next rank is incremented accordingly.
+    // can do with AtomicInteger
     private List<GameScoreDto> getRankedScores(List<GameScore> scores) {
         List<GameScoreDto> rankedScores = new ArrayList<>();
-        int rank = 0;
-        int trackRank = 0;
-        Integer prevScore = null;
 
-        for (GameScore score : scores) {
-            trackRank++;
+        int rank = 1;
+        int prevScore = -1;
 
-            if (prevScore == null || score.getScore() != prevScore) {
-                rank = trackRank;
+        for (int i = 0; i < scores.size(); i++) {
+            GameScore score = scores.get(i);
+            int currentScore = score.getScore();
+
+            if (i > 0 && currentScore != prevScore) {
+                rank++;
             }
 
             rankedScores.add(GameScoreDto.builder()
-                    .top(rank)
+                    .rank(rank)
                     .nickName(score.getUser().getNickName())
-                    .score(score.getScore())
+                    .score(currentScore)
                     .gameTypeStr(score.getGameType().name())
                     .build());
 
-            prevScore = score.getScore();
+            prevScore = currentScore;
         }
 
         return rankedScores;

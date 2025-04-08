@@ -1,6 +1,10 @@
 package com.easygame.service;
 
+import com.easygame.repository.type.GameType;
 import com.easygame.service.dto.GameScoreDto;
+import com.easygame.service.dto.UserDto;
+import com.easygame.service.exception.InvalidTokenException;
+import com.easygame.service.exception.NotFoundException;
 import com.easygame.service.mapper.GameScoreMapper;
 import com.easygame.repository.GameScore;
 import com.easygame.repository.GameScoreRepository;
@@ -19,18 +23,37 @@ import java.util.List;
 public class GameScoreService {
     private final GameScoreMapper gameScoreMapper;
     private final GameScoreRepository gameScoreRepository;
+    private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public void saveGameScore(GameScoreDto gameScoreDto) {
-        gameScoreMapper.toDto(gameScoreRepository.save(GameScore.builder()
-                    .scoreId(gameScoreDto.getScoreId())
-                    .nickName(gameScoreDto.getNickName())
-                    .score(gameScoreDto.getScore())
-                    .gameType(gameScoreDto.getGameType())
-                    .build()
-                )
+    public void saveScoreWithJwt(String headerToken, GameScoreDto gameScoreDto) throws Exception {
+        String token = resolveToken(headerToken);
+
+        if (!jwtTokenProvider.isValidToken(token)) {
+            throw new InvalidTokenException("invalid token");
+        }
+
+        String nickname = jwtTokenProvider.getNickname(token);
+        UserDto userDto = userService.getOrThrow(nickname);
+
+        if(!userDto.getNickName().equals(gameScoreDto.getNickName())) {
+            throw new IllegalArgumentException("illegal access user");
+        }
+
+        gameScoreRepository.save(GameScore.builder()
+                .userId(userDto.getUserId())
+                .score(gameScoreDto.getScore())
+                .gameType(GameType.from(gameScoreDto.getGameTypeStr()))
+                .build()
         );
     }
 
+    private String resolveToken(String header) {
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        throw new InvalidTokenException("cannot resolve token");
+    }
     public List<GameScoreDto> getTop10ByGameType(GameScoreDto gameScoreDto) {
         if(gameScoreDto.getTop() <= 0 || 1000 <= gameScoreDto.getTop()) {
             throw new IllegalArgumentException("invalid range");
@@ -58,7 +81,7 @@ public class GameScoreService {
 
             rankedScores.add(GameScoreDto.builder()
                     .top(rank)
-                    .nickName(score.getNickName())
+                    .nickName(score.getUser().getNickName())
                     .score(score.getScore())
                     .gameTypeStr(score.getGameType().name())
                     .build());

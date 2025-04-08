@@ -11,6 +11,6 @@ import java.util.List;
 
 @Repository
 public interface GameScoreRepository extends JpaRepository<GameScore, Long>, CustomGameScoreRepository {
-    @Query("SELECT g FROM GameScore g WHERE g.gameType = :gameType")
+    @Query("SELECT gs FROM GameScore gs JOIN FETCH gs.user WHERE gs.gameType = :gameType")
     List<GameScore> findByGameType(@Param("gameType") GameType gameType, Pageable pageable);
 }

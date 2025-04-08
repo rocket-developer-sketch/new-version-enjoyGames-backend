@@ -10,7 +10,7 @@ public class GameScoreMapper implements BaseMapper<GameScoreDto, GameScore> {
     @Override
     public GameScoreDto toDto(GameScore gameScore) {
         return GameScoreDto.builder()
-                .nickName(gameScore.getNickName())
+                .nickName(gameScore.getUser().getNickName())
                 .score(gameScore.getScore())
                 .gameTypeStr(gameScore.getGameType().name())
                 .build();
@@ -19,7 +19,7 @@ public class GameScoreMapper implements BaseMapper<GameScoreDto, GameScore> {
     @Override
     public GameScore toEntity(GameScoreDto gameScoreDto) {
         return GameScore.builder()
-                .nickName(gameScoreDto.getNickName())
+                .userId(gameScoreDto.getUserId())
                 .score(gameScoreDto.getScore())
                 .gameType(gameScoreDto.getGameType())
                 .build();

@@ -2,12 +2,10 @@ package com.easygame.api.controller;
 
 import com.easygame.api.mapper.GameScoreSaveMapper;
 import com.easygame.api.mapper.GameScoreTopMapper;
-import com.easygame.api.mapper.GameScoreResponseMapper;
 import com.easygame.api.request.GameScoreSaveRequest;
 import com.easygame.api.request.GameScoreTopRequest;
 import com.easygame.api.response.GameScoreTopResponse;
 import com.easygame.service.GameScoreService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +26,12 @@ public class GameScoreController {
     private final GameScoreService gameScoreService;
     private final GameScoreTopMapper gameScoreTopMapper;
     private final GameScoreSaveMapper gameScoreSaveMapper;
-    private final GameScoreResponseMapper gameScoreResponseMapper;
 
     @Tag(name = "Game Score API")
-    @Operation(summary = "Save User's Game Score", description = "save user's game score and nickname")
+    @Operation(summary = "Save User's Game Score", description = "save user's game score and nickname. authorization: Bearer <token>")
     @PostMapping
-    public ResponseEntity<Void> saveScore(@RequestBody GameScoreSaveRequest gameScoreSaveRequest) throws JsonProcessingException {
-        gameScoreService.saveGameScore(gameScoreSaveMapper.toDto(gameScoreSaveRequest));
+    public ResponseEntity<Void> saveScore(@RequestBody GameScoreSaveRequest gameScoreSaveRequest, @RequestHeader(name = "Authorization") String token) throws Exception {
+        gameScoreService.saveScoreWithJwt(token, gameScoreSaveMapper.toDto(gameScoreSaveRequest));
         return ResponseEntity.ok().build();
     }
 

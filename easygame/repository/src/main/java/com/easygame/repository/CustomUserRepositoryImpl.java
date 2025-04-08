@@ -2,9 +2,8 @@ package com.easygame.repository;
 
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
-public class CustomGameScoreRepositoryImpl implements CustomGameScoreRepository{
+public class CustomUserRepositoryImpl implements CustomUserRepository {
     @Autowired
     private EntityManager entityManager;
 }

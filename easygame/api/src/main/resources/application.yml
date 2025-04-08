@@ -54,3 +54,8 @@ springdoc:
   cache:
     disabled: true
   model-and-view-allowed: true
+
+jwt:
+  secretKey: easygame-very-secret-key-should-be-long-enough-for-hmac
+  expirationMs: 360000 # 6min = 5 * 60 * 1000
+

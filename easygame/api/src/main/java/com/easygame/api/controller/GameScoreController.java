@@ -48,7 +48,7 @@ public class GameScoreController {
                 .map(it -> GameScoreTopResponse.builder()
                         .nickName(it.getNickName())
                         .score(it.getScore())
-                        .rank(it.getTop())
+                        .rank(it.getRank())
                         .gameType(it.getGameTypeStr())
                         .build())
                 .toList());

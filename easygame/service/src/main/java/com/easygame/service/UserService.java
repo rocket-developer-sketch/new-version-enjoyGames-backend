@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
     public UserDto getOrThrow(String nickname) throws Exception {
         return userMapper.toDto(userRepository.findByNickName(nickname)
@@ -31,13 +30,13 @@ public class UserService {
         return userMapper.toDto(userRepository.save(User.builder().nickName(userDto.getNickName()).build()));
     }
 
-    public String registerUser(UserDto userDto) {
+    public UserDto registerUser(UserDto userDto) {
         if(exists(userDto.getNickName())) {
             throw new DuplicateNickNameException(userDto.getNickName());
         }
 
-        UserDto newUser = saveUser(userDto);
-        return jwtTokenProvider.createToken(newUser.getNickName());
+        return saveUser(userDto);
+//        return jwtTokenProvider.createToken(newUser.getNickName());
     }
 
 }

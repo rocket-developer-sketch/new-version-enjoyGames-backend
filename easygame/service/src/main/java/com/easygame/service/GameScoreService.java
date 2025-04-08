@@ -3,8 +3,6 @@ package com.easygame.service;
 import com.easygame.repository.type.GameType;
 import com.easygame.service.dto.GameScoreDto;
 import com.easygame.service.dto.UserDto;
-import com.easygame.service.exception.InvalidTokenException;
-import com.easygame.service.mapper.GameScoreMapper;
 import com.easygame.repository.GameScore;
 import com.easygame.repository.GameScoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +18,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class GameScoreService {
-    private final GameScoreMapper gameScoreMapper;
     private final GameScoreRepository gameScoreRepository;
     private final UserService userService;
-    private final JwtTokenProvider jwtTokenProvider;
 
-    public void saveScoreWithJwt(String headerToken, GameScoreDto gameScoreDto) throws Exception {
-        String token = resolveToken(headerToken);
 
-        if (!jwtTokenProvider.isValidToken(token)) {
-            throw new InvalidTokenException("invalid token");
-        }
-
-        String nickname = jwtTokenProvider.getNickname(token);
-        UserDto userDto = userService.getOrThrow(nickname);
+    public void saveScore(String resolvedNickName, GameScoreDto gameScoreDto) throws Exception {
+        UserDto userDto = userService.getOrThrow(resolvedNickName);
 
         if(!userDto.getNickName().equals(gameScoreDto.getNickName())) {
             throw new IllegalArgumentException("illegal access user");
@@ -47,17 +37,10 @@ public class GameScoreService {
         );
     }
 
-    private String resolveToken(String header) {
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
-        }
-        throw new InvalidTokenException("cannot resolve token");
-    }
     public List<GameScoreDto> getTop10ByGameType(GameScoreDto gameScoreDto) {
         if(gameScoreDto.getTop() <= 0 || 1000 <= gameScoreDto.getTop()) {
             throw new IllegalArgumentException("invalid range");
         }
-
 
         return getRankedScores(gameScoreRepository.findByGameType(gameScoreDto.getGameType(),
                         PageRequest.of(0, gameScoreDto.getTop(), Sort.by(Sort.Direction.DESC, "score"))

@@ -1,5 +1,6 @@
 package com.easygame.api.controller;
 
+import com.easygame.api.JwtTokenUtil;
 import com.easygame.api.mapper.UserSaveMapper;
 import com.easygame.api.request.GameScoreSaveRequest;
 import com.easygame.api.request.UserSaveRequest;
@@ -21,15 +22,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
     private final UserSaveMapper userSaveMapper;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Tag(name = "User API")
     @Operation(summary = "Register User", description = "save user and return token")
     @PostMapping
     public ResponseEntity<UserSaveResponse> registerUser(@RequestBody UserSaveRequest userSaveRequest) throws Exception {
-            return ResponseEntity.ok(
+        return ResponseEntity.ok(
                 UserSaveResponse.builder()
-                    .token(userService.registerUser(userSaveMapper.toDto(userSaveRequest)))
-                .build()
+                        .token(jwtTokenUtil.createTokenWithNickName(userService.registerUser(
+                                userSaveMapper.toDto(userSaveRequest)).getNickName())
+                        )
+                        .build()
         );
     }
 }

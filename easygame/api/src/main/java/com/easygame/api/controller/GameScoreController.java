@@ -1,5 +1,7 @@
 package com.easygame.api.controller;
 
+import com.easygame.api.JwtTokenUtil;
+//import com.easygame.api.RedisUtil;
 import com.easygame.api.mapper.GameScoreSaveMapper;
 import com.easygame.api.mapper.GameScoreTopMapper;
 import com.easygame.api.request.GameScoreSaveRequest;
@@ -26,12 +28,21 @@ public class GameScoreController {
     private final GameScoreService gameScoreService;
     private final GameScoreTopMapper gameScoreTopMapper;
     private final GameScoreSaveMapper gameScoreSaveMapper;
+    private final JwtTokenUtil jwtTokenUtil;
+//    private final RedisUtil redisUtil;
 
     @Tag(name = "Game Score API")
     @Operation(summary = "Save User's Game Score", description = "save user's game score and nickname. authorization: Bearer <token>")
     @PostMapping
-    public ResponseEntity<Void> saveScore(@RequestBody GameScoreSaveRequest gameScoreSaveRequest, @RequestHeader(name = "Authorization") String token) throws Exception {
-        gameScoreService.saveScoreWithJwt(token, gameScoreSaveMapper.toDto(gameScoreSaveRequest));
+    public ResponseEntity<Void> saveScore(@RequestBody GameScoreSaveRequest gameScoreSaveRequest,
+                                          @RequestHeader(name = "Authorization") String token) throws Exception {
+//        if (!redisUtil.isDuplicateSubmission(gameScoreSaveRequest.getNickName(), gameScoreSaveRequest.getGameType())) {
+            gameScoreService.saveScore(
+                    jwtTokenUtil.getNickNameByResolvedToken(token),
+                    gameScoreSaveMapper.toDto(gameScoreSaveRequest)
+            );
+//        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -39,7 +50,8 @@ public class GameScoreController {
     @Operation(summary = "Show Top 10", description = "query top 10")
     @GetMapping("/top")
     public ResponseEntity<List<GameScoreTopResponse>> getTopScores(@RequestParam String gameType, @RequestParam int top) {
-        return ResponseEntity.ok(gameScoreService.getTop10ByGameType(gameScoreTopMapper.toDto(GameScoreTopRequest.builder()
+        return ResponseEntity.ok(gameScoreService.getTop10ByGameType(
+                        gameScoreTopMapper.toDto(GameScoreTopRequest.builder()
                                 .gameType(gameType)
                                 .top(top)
                                 .build()

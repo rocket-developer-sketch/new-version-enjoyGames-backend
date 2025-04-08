@@ -14,10 +14,9 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 3
       auto-commit: true
-      #ms
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+      connection-timeout: 30000 #ms
+      idle-timeout: 600000 #ms
+      max-lifetime: 1800000 #ms
   jpa:
     hibernate:
       ddl-auto: none
@@ -29,7 +28,10 @@ spring:
       hibernate:
         format_sql: true
         type: trace
-
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
 logging:
   level:
     org.hibernate.SQL: DEBUG
@@ -56,6 +58,6 @@ springdoc:
   model-and-view-allowed: true
 
 jwt:
-  secretKey: easygame-very-secret-key-should-be-long-enough-for-hmac
-  expirationMs: 360000 # 6min = 5 * 60 * 1000
+  secret-key: easygame-very-secret-key-should-be-long-enough-for-hmac
+  expiration-ms: 360000 # 6min = 5 * 60 * 1000
 

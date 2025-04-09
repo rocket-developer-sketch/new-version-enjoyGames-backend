@@ -6,7 +6,7 @@ spring:
     ansi:
       enabled: always
   datasource:
-    url: jdbc:mysql://user_hostname:3306/easygame?serverTimezone=UTC
+    url: jdbc:mysql://your_hostname:3306/easygame?serverTimezone=UTC
     username: your_username
     password: your_password
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -17,6 +17,10 @@ spring:
       connection-timeout: 30000 #ms
       idle-timeout: 600000 #ms
       max-lifetime: 1800000 #ms
+  data:
+    redis:
+      host: your_hostname
+      port: 6379
   jpa:
     hibernate:
       ddl-auto: none
@@ -28,10 +32,6 @@ spring:
       hibernate:
         format_sql: true
         type: trace
-#  data:
-#    redis:
-#      host: localhost
-#      port: 6379
 logging:
   level:
     org.hibernate.SQL: DEBUG
@@ -60,3 +60,6 @@ springdoc:
 jwt:
   secret-key: easygame-very-secret-key-should-be-long-enough-for-hmac
   expiration-ms: 360000 # 6min = 5 * 60 * 1000
+
+redis:
+  ttl-minutes: 10

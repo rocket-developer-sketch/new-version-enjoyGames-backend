@@ -1,0 +1,65 @@
+server:
+  port: 8080
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    url: jdbc:mysql://your_hostname:3306/easygame?serverTimezone=UTC
+    username: your_username
+    password: your_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 3
+      auto-commit: true
+      connection-timeout: 30000 #ms
+      idle-timeout: 600000 #ms
+      max-lifetime: 1800000 #ms
+  data:
+    redis:
+      host: your_hostname
+      port: 6379
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        type: trace
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    com.easygame: DEBUG
+
+springdoc:
+  api-docs:
+    path: /docs/v1
+    groups:
+      enabled: true
+
+  swagger-ui:
+    path: /easygame-api-ui.html
+    url: /docs/v1/easygame-openapi
+    enabled: true
+    groups-order: ASC
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+  cache:
+    disabled: true
+  model-and-view-allowed: true
+
+jwt:
+  secret-key: easygame-very-secret-key-should-be-long-enough-for-hmac
+  expiration-ms: 360000 # 6min = 5 * 60 * 1000
+
+redis:
+  ttl-minutes: 10

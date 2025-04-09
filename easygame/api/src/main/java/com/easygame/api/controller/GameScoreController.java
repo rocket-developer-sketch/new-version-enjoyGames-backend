@@ -1,7 +1,7 @@
 package com.easygame.api.controller;
 
 import com.easygame.api.JwtTokenUtil;
-//import com.easygame.api.RedisUtil;
+import com.easygame.api.RedisUtil;
 import com.easygame.api.mapper.GameScoreSaveMapper;
 import com.easygame.api.mapper.GameScoreTopMapper;
 import com.easygame.api.request.GameScoreSaveRequest;
@@ -29,19 +29,19 @@ public class GameScoreController {
     private final GameScoreTopMapper gameScoreTopMapper;
     private final GameScoreSaveMapper gameScoreSaveMapper;
     private final JwtTokenUtil jwtTokenUtil;
-//    private final RedisUtil redisUtil;
+    private final RedisUtil redisUtil;
 
     @Tag(name = "Game Score API")
     @Operation(summary = "Save User's Game Score", description = "save user's game score and nickname. authorization: Bearer <token>")
     @PostMapping
     public ResponseEntity<Void> saveScore(@RequestBody GameScoreSaveRequest gameScoreSaveRequest,
                                           @RequestHeader(name = "Authorization") String token) throws Exception {
-//        if (!redisUtil.isDuplicateSubmission(gameScoreSaveRequest.getNickName(), gameScoreSaveRequest.getGameType())) {
+        if (!redisUtil.isDuplicateSubmission(gameScoreSaveRequest.getNickName(), gameScoreSaveRequest.getGameType())) {
             gameScoreService.saveScore(
                     jwtTokenUtil.getNickNameByResolvedToken(token),
                     gameScoreSaveMapper.toDto(gameScoreSaveRequest)
             );
-//        }
+        }
 
         return ResponseEntity.ok().build();
     }

@@ -25,7 +25,13 @@ subprojects {
     apply plugin: 'io.spring.dependency-management'
 
     configurations {
-        compileOnly {
+        compileOnly { 
+            extendsFrom annotationProcessor
+        }
+        testCompileOnly {
+            extendsFrom annotationProcessor
+        }
+        testAnnotationProcessor {
             extendsFrom annotationProcessor
         }
     }
@@ -42,7 +48,7 @@ subprojects {
         compileOnly 'org.projectlombok:lombok:1.18.38'
         annotationProcessor 'org.projectlombok:lombok:1.18.38'
         testImplementation 'org.springframework.boot:spring-boot-starter-test:3.4.4'
-        testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.2'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.1'
     }
 
     test {

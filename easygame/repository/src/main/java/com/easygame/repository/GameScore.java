@@ -37,7 +37,7 @@ public class GameScore extends BaseTime {
             this.scoreId = scoreId;
         }
 
-        if(userId != null) {
+        if(userId != null && 0 < userId) {
             this.user = User.builder().userId(userId).build();
         }
 

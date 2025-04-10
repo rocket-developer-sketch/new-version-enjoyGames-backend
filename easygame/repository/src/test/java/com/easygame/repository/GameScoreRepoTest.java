@@ -19,15 +19,8 @@ public class GameScoreRepoTest {
     private ApplicationContext context;
 
     @Test
-    void printBeans() {
-        Arrays.stream(context.getBeanDefinitionNames())
-                .filter(name -> name.contains("gameScoreRepository"))
-                .forEach(System.out::println);
-    }
-
-    @Test
     @DisplayName("Throws exception when saving without user")
-    void saveGameScoreWithoutUserShouldFail() {
+    void saveGameScoreWithoutUser_shouldFail() {
         GameScore score = GameScore.builder()
                 .userId(null)
                 .score(1000)
@@ -40,7 +33,7 @@ public class GameScoreRepoTest {
 
     @Test
     @DisplayName("Throws exception when saving user id is 0")
-    void saveGameScoreWithUserIdZeroShouldFail() {
+    void saveGameScoreWithUserIdZero_shouldFail() {
         GameScore score = GameScore.builder()
                 .userId(0L)
                 .score(1000)

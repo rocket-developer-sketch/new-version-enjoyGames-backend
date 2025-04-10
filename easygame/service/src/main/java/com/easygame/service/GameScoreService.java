@@ -23,11 +23,11 @@ public class GameScoreService {
 
 
     public void saveScore(String resolvedNickName, GameScoreDto gameScoreDto) throws Exception {
-        UserDto userDto = userService.getOrThrow(resolvedNickName);
-
-        if(!userDto.getNickName().equals(gameScoreDto.getNickName())) {
-            throw new IllegalArgumentException("illegal access user");
+        if(!isValidRangeOfScore(gameScoreDto.getScore())) {
+            throw new IllegalArgumentException("Invalid score range");
         }
+
+        UserDto userDto = validateScoreSubmission(resolvedNickName, gameScoreDto);
 
         gameScoreRepository.save(GameScore.builder()
                 .userId(userDto.getUserId())
@@ -38,7 +38,7 @@ public class GameScoreService {
     }
 
     public List<GameScoreDto> getTop10ByGameType(GameScoreDto gameScoreDto) {
-        if(gameScoreDto.getTop() <= 0 || 1000 <= gameScoreDto.getTop()) {
+        if(!isValidRangeOfTopScore(gameScoreDto.getTop())) {
             throw new IllegalArgumentException("invalid range");
         }
 
@@ -46,6 +46,24 @@ public class GameScoreService {
                         PageRequest.of(0, gameScoreDto.getTop(), Sort.by(Sort.Direction.DESC, "score"))
                 )
         );
+    }
+
+    private UserDto validateScoreSubmission(String resolvedNickName, GameScoreDto gameScoreDto) throws Exception {
+        UserDto userDto = userService.getOrThrow(resolvedNickName);
+
+        if(!userDto.getNickName().equals(gameScoreDto.getNickName())) {
+            throw new IllegalArgumentException("illegal access user");
+        }
+
+        return userDto;
+    }
+
+    private boolean isValidRangeOfTopScore(int top) {
+        return top > 0 && 1000 > top;
+    }
+
+    private boolean isValidRangeOfScore(int score) {
+        return score >= 0;
     }
 
     // When multiple players have the same score, the next rank is incremented accordingly.

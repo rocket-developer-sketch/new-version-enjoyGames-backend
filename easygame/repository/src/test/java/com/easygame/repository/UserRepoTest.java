@@ -20,13 +20,6 @@ public class UserRepoTest {
     private ApplicationContext context;
 
     @Test
-    void printBeans() {
-        Arrays.stream(context.getBeanDefinitionNames())
-                .filter(name -> name.contains("userRepository"))
-                .forEach(System.out::println);
-    }
-
-    @Test
     @DisplayName("Confirms successful user save")
     void saveUser_success() {
         User user = User.builder()

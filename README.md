@@ -4,6 +4,13 @@
 > A backend API server for storing scores and retrieving rankings in single-player web games.  
 > 싱글플레이어 웹 게임의 점수를 저장하고 랭킹을 조회할 수 있는 백엔드 API 서버입니다.
 
+> This project aims to evolve a single-player web game I developed 4 years ago by integrating a backend API to provide a more advanced service.
+> The original game will also be refactored into a modern React project.
+> You can find the original game repository here: https://github.com/rocket-developer-sketch/enjoyGames
+> 4년 전에 만든 싱글플레이 웹 게임에 백엔드 API를 추가하여 더 발전된 서비스를 만드는 것을 목표로 합니다.
+> 기존 게임은 최신 React 프로젝트로 리팩토링할 예정입니다.
+> 기존 게임의 GitHub 레포지토리는 다음 링크에서 확인하실 수 있습니다: https://github.com/rocket-developer-sketch/enjoyGames
+
 Built with **Spring Boot**, this RESTful API server adopts a **multi-module architecture** and includes features such as **JWT authentication**, **Redis-based locking**, and a **Dockerized development environment**.  
 **Spring Boot** 기반으로, **멀티 모듈 아키텍처**, **JWT 인증**, **Redis 락**, **Docker 개발 환경** 등을 갖추고 있습니다.
 

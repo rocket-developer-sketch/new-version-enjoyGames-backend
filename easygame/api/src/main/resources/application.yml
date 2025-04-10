@@ -6,9 +6,12 @@ spring:
     ansi:
       enabled: always
   datasource:
-    url: jdbc:mysql://your_hostname:3306/easygame?serverTimezone=UTC
-    username: your_username
-    password: your_password
+    url: jdbc:mysql://easygame-db:3306/easygame?serverTimezone=UTC
+    username: root
+    password: password123!
+#    url: jdbc:mysql://localhost:3306/easygame?serverTimezone=UTC
+#    username: root
+#    password: passQwe321!
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -19,7 +22,7 @@ spring:
       max-lifetime: 1800000 #ms
   data:
     redis:
-      host: your_hostname
+      host: easygame-cache-server
       port: 6379
   jpa:
     hibernate:
@@ -60,6 +63,14 @@ springdoc:
 jwt:
   secret-key: easygame-very-secret-key-should-be-long-enough-for-hmac
   expiration-ms: 360000 # 6min = 5 * 60 * 1000
+
+auth:
+  exclude-paths:
+    - /easygame-api-ui.html
+    - /swagger-ui/**
+    - /docs/v1/**
+    - /api/v1/q/score/**
+    - /api/v1/user/**
 
 redis:
   ttl-minutes: 10

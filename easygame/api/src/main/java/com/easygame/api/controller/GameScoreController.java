@@ -26,14 +26,13 @@ public class GameScoreController {
     //private static final Logger log = LoggerFactory.getLogger(GameScoreController.class);
 
     private final GameScoreService gameScoreService;
-    private final GameScoreTopMapper gameScoreTopMapper;
     private final GameScoreSaveMapper gameScoreSaveMapper;
     private final JwtTokenUtil jwtTokenUtil;
     private final RedisUtil redisUtil;
 
     @Tag(name = "Game Score API")
     @Operation(summary = "Save User's Game Score", description = "save user's game score and nickname. authorization: Bearer <token>")
-    @PostMapping
+    @PostMapping("/user")
     public ResponseEntity<Void> saveScore(@RequestBody GameScoreSaveRequest gameScoreSaveRequest,
                                           @RequestHeader(name = "Authorization") String token) throws Exception {
         if (!redisUtil.isDuplicateSubmission(gameScoreSaveRequest.getNickName(), gameScoreSaveRequest.getGameType())) {
@@ -45,34 +44,5 @@ public class GameScoreController {
 
         return ResponseEntity.ok().build();
     }
-
-    @Tag(name = "Game Score API")
-    @Operation(summary = "Show Top 10", description = "query top 10")
-    @GetMapping("/top")
-    public ResponseEntity<List<GameScoreTopResponse>> getTopScores(@RequestParam String gameType, @RequestParam int top) {
-        return ResponseEntity.ok(gameScoreService.getTop10ByGameType(
-                        gameScoreTopMapper.toDto(GameScoreTopRequest.builder()
-                                .gameType(gameType)
-                                .top(top)
-                                .build()
-                        )
-                ).stream()
-                .map(it -> GameScoreTopResponse.builder()
-                        .nickName(it.getNickName())
-                        .score(it.getScore())
-                        .rank(it.getRank())
-                        .gameType(it.getGameTypeStr())
-                        .build())
-                .toList());
-    }
-
-//    @GetMapping("/test")
-//    public void testLog() {
-//        log.trace("TRACE level message");
-//        log.debug("DEBUG level message");
-//        log.info("INFO level message");
-//        log.warn("WARN level message");
-//        log.error("ERROR level message");
-//    }
 
 }

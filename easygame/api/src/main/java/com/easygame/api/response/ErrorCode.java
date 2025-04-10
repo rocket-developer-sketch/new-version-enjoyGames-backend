@@ -7,10 +7,14 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-    INVALID_REQUEST("Not Found", HttpStatus.BAD_REQUEST),
-    GAME_TYPE_NOT_FOUND("Not Found", HttpStatus.NOT_FOUND),
-    INTERNAL_ERROR("Unexpected Error", HttpStatus.INTERNAL_SERVER_ERROR);
+    INVALID_REQUEST(1, "Invalid request", HttpStatus.BAD_REQUEST),
+    INVALID_TOKEN(2, "Invalid request", HttpStatus.UNAUTHORIZED),
+    NOT_FOUND(3, "Invalid request", HttpStatus.NOT_FOUND),
+    DUPLICATE_USER(4, "Exist user", HttpStatus.BAD_REQUEST),
+    DUPLICATE_SUBMISSION(5, "Invalid Request", HttpStatus.BAD_REQUEST),
+    INTERNAL_ERROR(6, "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
 
-  private String message;
+    private int code;
+    private String message;
   private HttpStatus status;
 }

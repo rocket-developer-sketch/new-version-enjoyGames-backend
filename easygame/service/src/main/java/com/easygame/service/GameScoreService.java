@@ -1,7 +1,8 @@
 package com.easygame.service;
 
+import com.easygame.repository.type.GameType;
 import com.easygame.service.dto.GameScoreDto;
-import com.easygame.service.mapper.GameScoreMapper;
+import com.easygame.service.dto.UserDto;
 import com.easygame.repository.GameScore;
 import com.easygame.repository.GameScoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,25 +18,29 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class GameScoreService {
-    private final GameScoreMapper gameScoreMapper;
     private final GameScoreRepository gameScoreRepository;
+    private final UserService userService;
 
-    public void saveGameScore(GameScoreDto gameScoreDto) {
-        gameScoreMapper.toDto(gameScoreRepository.save(GameScore.builder()
-                    .scoreId(gameScoreDto.getScoreId())
-                    .nickName(gameScoreDto.getNickName())
-                    .score(gameScoreDto.getScore())
-                    .gameType(gameScoreDto.getGameType())
-                    .build()
-                )
+
+    public void saveScore(String resolvedNickName, GameScoreDto gameScoreDto) throws Exception {
+        if(!isValidRangeOfScore(gameScoreDto.getScore())) {
+            throw new IllegalArgumentException("Invalid score range");
+        }
+
+        UserDto userDto = validateScoreSubmission(resolvedNickName, gameScoreDto);
+
+        gameScoreRepository.save(GameScore.builder()
+                .userId(userDto.getUserId())
+                .score(gameScoreDto.getScore())
+                .gameType(GameType.from(gameScoreDto.getGameTypeStr()))
+                .build()
         );
     }
 
     public List<GameScoreDto> getTop10ByGameType(GameScoreDto gameScoreDto) {
-        if(gameScoreDto.getTop() <= 0 || 1000 <= gameScoreDto.getTop()) {
+        if(!isValidRangeOfTopScore(gameScoreDto.getTop())) {
             throw new IllegalArgumentException("invalid range");
         }
-
 
         return getRankedScores(gameScoreRepository.findByGameType(gameScoreDto.getGameType(),
                         PageRequest.of(0, gameScoreDto.getTop(), Sort.by(Sort.Direction.DESC, "score"))
@@ -43,27 +48,48 @@ public class GameScoreService {
         );
     }
 
+    private UserDto validateScoreSubmission(String resolvedNickName, GameScoreDto gameScoreDto) throws Exception {
+        UserDto userDto = userService.getOrThrow(resolvedNickName);
+
+        if(!userDto.getNickName().equals(gameScoreDto.getNickName())) {
+            throw new IllegalArgumentException("illegal access user");
+        }
+
+        return userDto;
+    }
+
+    private boolean isValidRangeOfTopScore(int top) {
+        return top > 0 && 1000 > top;
+    }
+
+    private boolean isValidRangeOfScore(int score) {
+        return score >= 0;
+    }
+
+    // When multiple players have the same score, the next rank is incremented accordingly.
+    // can do with AtomicInteger
     private List<GameScoreDto> getRankedScores(List<GameScore> scores) {
         List<GameScoreDto> rankedScores = new ArrayList<>();
-        int rank = 0;
-        int trackRank = 0;
-        Integer prevScore = null;
 
-        for (GameScore score : scores) {
-            trackRank++;
+        int rank = 1;
+        int prevScore = -1;
 
-            if (prevScore == null || score.getScore() != prevScore) {
-                rank = trackRank;
+        for (int i = 0; i < scores.size(); i++) {
+            GameScore score = scores.get(i);
+            int currentScore = score.getScore();
+
+            if (i > 0 && currentScore != prevScore) {
+                rank++;
             }
 
             rankedScores.add(GameScoreDto.builder()
-                    .top(rank)
-                    .nickName(score.getNickName())
-                    .score(score.getScore())
+                    .rank(rank)
+                    .nickName(score.getUser().getNickName())
+                    .score(currentScore)
                     .gameTypeStr(score.getGameType().name())
                     .build());
 
-            prevScore = score.getScore();
+            prevScore = currentScore;
         }
 
         return rankedScores;

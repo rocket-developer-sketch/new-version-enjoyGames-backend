@@ -6,12 +6,9 @@ spring:
     ansi:
       enabled: always
   datasource:
-    url: jdbc:mysql://easygame-db:3306/easygame?serverTimezone=UTC
-    username: root
-    password: password123!
-#    url: jdbc:mysql://localhost:3306/easygame?serverTimezone=UTC
-#    username: root
-#    password: passQwe321!
+    url: jdbc:mysql://your-hostname:3306/easygame?serverTimezone=UTC
+    username: your-username
+    password: your-password
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -65,12 +62,8 @@ jwt:
   expiration-ms: 360000 # 6min = 5 * 60 * 1000
 
 auth:
-  exclude-paths:
-    - /easygame-api-ui.html
-    - /swagger-ui/**
-    - /docs/v1/**
-    - /api/v1/q/score/**
-    - /api/v1/user/**
-
+  include-paths:
+    - /api/v1/score/**
+    -
 redis:
   ttl-minutes: 10

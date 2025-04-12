@@ -15,7 +15,6 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -37,10 +36,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
 
-        boolean isExcluded = authProperties.getExcludePaths().stream()
+        boolean isIncluded = authProperties.getIncludePaths().stream()
                 .anyMatch(pattern -> pathMatcher.match(pattern, uri));
 
-        if (isExcluded) {
+        if (!isIncluded) {
             filterChain.doFilter(request, response); // no authentication needed
             return;
         }
@@ -52,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Authentication auth = jwtTokenUtil.getAuthentication(token); // auth create
             SecurityContextHolder.getContext().setAuthentication(auth); // save auth
         } catch (Exception e) {
-            log.info("API Authentication Exception : {}", e.getMessage(), e);
+            log.error("API Authentication Exception : {}", e.getMessage(), e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(ErrorCode.INVALID_TOKEN.getMessage());
             return;

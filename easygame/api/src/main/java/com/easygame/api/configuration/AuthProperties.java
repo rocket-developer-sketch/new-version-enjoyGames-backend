@@ -12,20 +12,20 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "auth")
 public class AuthProperties {
-    private List<String> excludePaths;
+    private List<String> includePaths;
 
-    public List<String> getExcludePaths() {
-        return excludePaths;
+    public List<String> getIncludePaths() {
+        return includePaths;
     }
 
-    public void setExcludePaths(List<String> excludePaths) {
-        this.excludePaths = excludePaths;
+    public void setIncludePaths(List<String> includePaths) {
+        this.includePaths = includePaths;
     }
 
     @Override
     public String toString() {
         return "AuthProperties{" +
-                "excludePaths=" + excludePaths +
+                "includePaths=" + includePaths +
                 '}';
     }
 }

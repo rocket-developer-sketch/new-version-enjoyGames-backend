@@ -63,7 +63,7 @@ jwt:
 
 auth:
   include-paths:
-    - /api/v1/score/**
+    - /api/v1/scores/**
 
 redis:
   ttl-minutes: 10

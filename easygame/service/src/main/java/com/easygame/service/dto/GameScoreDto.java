@@ -10,18 +10,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameScoreDto {
     private Long scoreId;
-    private Long userId;
     private String nickName;
+    private String jti;
     private int score;
     private String gameTypeStr;
     private int top;
     private int rank;
 
     @Builder
-    public GameScoreDto(Long scoreId, Long userId, String nickName, int score, String gameTypeStr, int top, int rank) {
+    public GameScoreDto(Long scoreId, String nickName, String jti, int score, String gameTypeStr, int top, int rank) {
         this.scoreId = scoreId;
-        this.userId = userId;
         this.nickName = nickName;
+        this.jti = jti;
         this.score = score;
         this.gameTypeStr = gameTypeStr;
         this.top = top;

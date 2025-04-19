@@ -15,6 +15,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.4.4'
     implementation 'org.springframework.boot:spring-boot-devtools:3.4.4'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.4.4'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.4.4'
+    testImplementation 'com.h2database:h2:2.3.232'
+    testImplementation 'it.ozimov:embedded-redis:0.7.2'
+
 
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
@@ -31,5 +35,19 @@ dependencies {
 // @RequestParam name reflection
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-parameters"
+}
+
+test {
+    useJUnitPlatform()
+    classpath += project(':api').sourceSets.test.output
+
+    testLogging {
+        events "passed", "skipped", "failed", "standard_out", "standard_error"
+        showStandardStreams = true
+        exceptionFormat = 'full'
+        // Force logging at lifecycle and info levels
+        info.events = ["started", "passed", "skipped", "failed", "standard_out", "standard_error"]
+        lifecycle.events = ["passed", "failed", "skipped", "standard_out", "standard_error"]
+    }
 }
 

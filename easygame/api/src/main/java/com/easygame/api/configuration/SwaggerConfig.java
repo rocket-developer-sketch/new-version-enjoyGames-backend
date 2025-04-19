@@ -17,9 +17,18 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI().info(new Info()
-                .title("easygame-openapi")
+                .title("Easygame API")
                 .version("1.0")
-                .description("easygame api"))
+                .description("""
+                    Welcome to the Easygame API documentation.  
+                    You can explore and test available endpoints here.
+                
+                    * To access secured APIs:
+                    1. Get an authentication token from Step 1 - User API.
+                    2. Click the 'Authorize' button at the top-right corner and paste the token.
+                    3. Public query APIs do not require authentication.
+                    """
+                ))
                 .addSecurityItem(new SecurityRequirement().addList("JWT"))
                 .components(new Components().addSecuritySchemes("JWT",
                         new SecurityScheme()

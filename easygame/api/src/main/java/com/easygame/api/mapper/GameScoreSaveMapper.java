@@ -9,6 +9,7 @@ public class GameScoreSaveMapper {
     public GameScoreDto toDto(GameScoreSaveRequest request) {
         return GameScoreDto.builder()
                 .nickName(request.getNickName())
+                .jti(request.getJti())
                 .score(request.getScore())
                 .gameTypeStr(request.getGameType())
                 .build();

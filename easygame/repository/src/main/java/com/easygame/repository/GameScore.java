@@ -2,10 +2,12 @@ package com.easygame.repository;
 
 import com.easygame.repository.type.GameType;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
-
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,12 +18,11 @@ public class GameScore extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scoreId;
 
-//    @Column(nullable = false, length = 30)
-//    private String nickName;
+    @Column(nullable = false, length = 30)
+    private String nickName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false, length = 36)
+    private String jti;
 
     @Column(nullable = false)
     private int score;
@@ -31,18 +32,23 @@ public class GameScore extends BaseTime {
     private GameType gameType;
 
     @Builder
-    //public GameScore(Long scoreId, String nickName, int score, GameType gameType) {
-    public GameScore(Long scoreId, Long userId, int score, GameType gameType) {
+    public GameScore(Long scoreId, String nickName, String jti, int score, GameType gameType) {
         if(scoreId != null) {
             this.scoreId = scoreId;
         }
-
-        if(userId != null && 0 < userId) {
-            this.user = User.builder().userId(userId).build();
+        if (nickName == null || nickName.trim().isEmpty()) {
+            throw new IllegalArgumentException("nickName must not be null or empty");
+        }
+        if (jti == null || jti.trim().isEmpty()) {
+            throw new IllegalArgumentException("jti must not be null or empty");
+        }
+        if (gameType == null) {
+            throw new IllegalArgumentException("gameType must not be null");
         }
 
-        //this.nickName = nickName;
         this.score = score;
+        this.nickName = nickName;
+        this.jti = jti;
         this.gameType = gameType;
     }
 
@@ -50,7 +56,8 @@ public class GameScore extends BaseTime {
     public String toString() {
         return "GameScore{" +
                 "scoreId=" + scoreId +
-                ", user=" + user +
+                ", nickName='" + nickName + '\'' +
+                ", jti='" + jti +'\'' +
                 ", score=" + score +
                 ", gameType=" + gameType +
                 '}';
@@ -60,11 +67,11 @@ public class GameScore extends BaseTime {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         GameScore gameScore = (GameScore) o;
-        return score == gameScore.score && Objects.equals(scoreId, gameScore.scoreId) && Objects.equals(user, gameScore.user) && gameType == gameScore.gameType;
+        return score == gameScore.score && Objects.equals(scoreId, gameScore.scoreId) && Objects.equals(nickName, gameScore.nickName) && Objects.equals(jti, gameScore.jti) && gameType == gameScore.gameType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(scoreId, user, score, gameType);
+        return Objects.hash(scoreId, nickName, jti, score, gameType);
     }
 }

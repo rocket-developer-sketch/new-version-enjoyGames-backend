@@ -1,6 +1,7 @@
 package com.easygame.api.configuration;
 
 import com.easygame.api.exception.DuplicateSubmissionException;
+import com.easygame.api.exception.InvalidAuthentication;
 import com.easygame.api.response.ErrorCode;
 import com.easygame.api.response.ErrorResponse;
 import com.easygame.service.exception.DuplicateNickNameException;
@@ -31,6 +32,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateNickNameException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateNickName(DuplicateNickNameException e) {
         return ResponseEntity.badRequest().body(new ErrorResponse(ErrorCode.DUPLICATE_USER));
+    }
+
+    @ExceptionHandler(InvalidAuthentication.class)
+    public ResponseEntity<ErrorResponse> handleInvalidAuthentication(InvalidAuthentication e) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(ErrorCode.INVALID_REQUEST));
     }
 
     @ExceptionHandler(DuplicateSubmissionException.class)

@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+        show_sql: false
+
+  h2:
+    console:
+      enabled: false
+
+  test:
+    database:
+      replace: auto
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+#logging:
+#  level:
+#    root: INFO
+#    org.springframework.boot.context.config: DEBUG

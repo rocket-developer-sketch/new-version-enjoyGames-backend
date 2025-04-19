@@ -6,23 +6,21 @@ spring:
     ansi:
       enabled: always
   datasource:
-    url: jdbc:mysql://easygame-db:3306/easygame?serverTimezone=UTC
-    username: root
-    password: password123!
-#    url: jdbc:mysql://localhost:3306/easygame?serverTimezone=UTC
-#    username: root
-#    password: passQwe321!
+    url: jdbc:mysql://your_hostname:3306/easygame?serverTimezone=UTC
+    username: your_username
+    password: your_password
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
       minimum-idle: 3
       auto-commit: true
+      initialization-fail-timeout: 10000 # 10ms
       connection-timeout: 30000 #ms
       idle-timeout: 600000 #ms
       max-lifetime: 1800000 #ms
   data:
     redis:
-      host: easygame-cache-server
+      host: your_hostname
       port: 6379
   jpa:
     hibernate:
@@ -35,11 +33,14 @@ spring:
       hibernate:
         format_sql: true
         type: trace
+        dialect: org.hibernate.dialect.MySQLDialect
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
     com.easygame: DEBUG
+    root: INFO
+    org.springframework.core.env: DEBUG
 
 springdoc:
   api-docs:
@@ -64,13 +65,23 @@ jwt:
   secret-key: easygame-very-secret-key-should-be-long-enough-for-hmac
   expiration-ms: 360000 # 6min = 5 * 60 * 1000
 
-auth:
-  exclude-paths:
-    - /easygame-api-ui.html
-    - /swagger-ui/**
-    - /docs/v1/**
-    - /api/v1/q/score/**
-    - /api/v1/user/**
+hmac:
+  secret-key: easygame-very-secret-key-should-be-long-enough-for-hmac-save-game-score
+
+filter-paths:
+  submit-path:
+    include-paths:
+      - /api/v1/scores
+  auth-path:
+    include-paths:
+      - /api/v1/token/scores
+      - /api/v1/scores
 
 redis:
-  ttl-minutes: 10
+#  ttl-minutes: 10
+  ttls:
+    whitelist-ttl: 10
+    submit-score-ttl: 3
+  keys:
+    whitelist-prefix: jwt:whitelist
+    submit-score-prefix: jwt:submit

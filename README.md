@@ -6,10 +6,13 @@
 
 > This project aims to evolve a single-player web game I developed 4 years ago by integrating a backend API to provide a more advanced service.  
 > The original game will also be refactored into a modern React project.  
-> You can find the original game repository here: https://github.com/rocket-developer-sketch/enjoyGames  
+> You can find the original game repository here: 
+>  https://github.com/rocket-developer-sketch/enjoyGames    
+
 > 4년 전에 만든 싱글플레이 웹 게임에 백엔드 API를 추가하여 더 발전된 서비스를 만드는 것을 목표로 합니다.    
 > 기존 게임은 최신 React 프로젝트로 리팩토링할 예정입니다.  
-> 기존 게임의 GitHub 레포지토리는 다음 링크에서 확인하실 수 있습니다: https://github.com/rocket-developer-sketch/enjoyGames  
+> 기존 게임의 GitHub 레포지토리는 다음 링크에서 확인하실 수 있습니다:   
+>  https://github.com/rocket-developer-sketch/enjoyGames    
 
 Built with **Spring Boot**, this RESTful API server adopts a **multi-module architecture** and includes features such as **JWT authentication**, **Redis-based locking**, and a **Dockerized development environment**.    
 **Spring Boot** 기반으로, **멀티 모듈 아키텍처**, **JWT 인증**, **Redis 락**, **Docker 개발 환경** 등을 갖추고 있습니다.
@@ -58,7 +61,7 @@ Built with **Spring Boot**, this RESTful API server adopts a **multi-module arch
 ## 🧪 API Documentation / API 명세서
 
 > Accessible via Swagger UI  
-> 📎 [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+> 📎 [http://{hostname}:{port}/swagger-ui/index.html](http://{hostname}:{port}/swagger-ui/index.html)
 
 **Example / 예시:**
 
@@ -102,49 +105,26 @@ docker compose down
 
 ## ✅ Testing / 테스트
 
-- Unit tests for repository and service layers  
-  `repository`, `service` 단위 테스트 포함
-- Over 85% test coverage on core business logic  
+### 🎯 Unit tests for api, repository and service layers  
+  `api`, `repository`, `service` 단위 테스트 포함
+### 🎯 Over 85% test coverage on core business logic  
   핵심 비즈니스 로직 테스트 커버리지 85% 이상 유지
 
 ```bash
+./gradlew :api:test
 ./gradlew :service:test
 ./gradlew :repository:test
 ```
 
----
+### 🎯 Score Submission Flow / 점수 제출 흐름
 
-## 📊 Database Schema (ERD) / 데이터베이스 구조
-
-```
-[User] --- (1:N) --- [GameScore]
-          ↳ userId (BIGINT)
-```
-- See **Todos** for upcoming changes. / 향후 개선 예정은 Todos 참고
-
----
-
-## 🛠️ Troubleshooting & Highlights / 기술 포인트
-
-| Topic / 주제           | Description / 내용 |
-|------------------------|---------------------|
-| Spring Security        | Custom JWT authentication / JWT 기반 인증 처리 |
-| Redis TTL Lock         | Prevents duplicate scores / 점수 중복 저장 방지 |
-| Multi-module Setup     | Dependency resolution / 의존성 문제 해결 |
-| Testing Environment    | Separated test config / 테스트 환경 분리 구성 |
-
----
-
-
-## 🎯 Score Submission Flow / 점수 제출 흐름
-
-### 🔐Security Architecture / 보안 구조
+#### 🔐Security Architecture / 보안 구조
 
 - User Authentication: JWT-based authentication
 - Score Tampering Prevention: HMAC-based signature using `nickName`, `score`, and `jti` → `signedToken`
 - Duplicate Submission Protection: Redis-based `jti` tracking with TTL (Time-to-Live)
 
-### ✅ Integration Flow (with Filters) / 테스트 흐름
+#### ✅ Integration Flow (with Filters) / 테스트 흐름
 
 ```
 ┌────────────────────────────────────┐
@@ -180,7 +160,7 @@ docker compose down
 
 ```
 
-### 🧪  Integration Test Execution / 테스트 실행
+#### 🧪  Integration Test Execution / 테스트 실행
 
 ```bash
 ./gradlew :api:test --tests "com.easygame.api.integration.ScoreSubmissionFlowTest"
@@ -188,19 +168,41 @@ docker compose down
 
 ---
 
+## 📊 Database Schema (ERD) / 데이터베이스 구조
+
+```
+[User] --- (1:N) --- [GameScore]
+          ↳ userId (BIGINT)
+```
+- See **Todos** for upcoming changes. / 향후 개선 예정은 Todos 참고
+
+---
+
+## 🛠️ Troubleshooting & Highlights / 기술 포인트
+
+| Topic / 주제           | Description / 내용 |
+|------------------------|---------------------|
+| Spring Security        | Custom JWT authentication / JWT 기반 인증 처리 |
+| Redis TTL Lock         | Prevents duplicate scores / 점수 중복 저장 방지 |
+| Multi-module Setup     | Dependency resolution / 의존성 문제 해결 |
+| Testing Environment    | Separated test config / 테스트 환경 분리 구성 |
+
+
+---
+
 ## 🚧 Todos
 
 ### Deployment / 배포
 
-- Deploy to AWS EC2 and RDS / AWS EC2 및 RDS 배포 예정
-- Separate Spring Boot profiles for test and production environments / 배포 환경별 프로파일 분리 예정
+- [] Deploy to AWS EC2 and RDS / AWS EC2 및 RDS 배포 예정
+- [] Separate Spring Boot profiles for test and production environments / 배포 환경별 프로파일 분리 예정
 
 ### Auth & Validation / 인증 및 검증
 
-- Support duplicate nicknames securely / 중복 닉네임 허용 + 보안 검증
-- Remove user table / 사용자 테이블 제거 예정
-- Refactor Redis lock logic / Redis 락 로직 개선 예정
+- [x] Support duplicate nicknames securely / 중복 닉네임 허용 + 보안 검증
+- [x] Remove user table / 사용자 테이블 제거 예정
+- [x] Refactor Redis lock logic / Redis 락 로직 개선 예정
 
 ### Testing / 테스트
 
-- Add integration tests / 통합 테스트 추가 예정
+- [x] Add integration tests / 통합 테스트 추가 예정

@@ -1,9 +1,8 @@
 package com.easygame.service;
 
+import com.easygame.repository.GameScore;
 import com.easygame.repository.type.GameType;
 import com.easygame.service.dto.GameScoreDto;
-import com.easygame.service.dto.UserDto;
-import com.easygame.repository.GameScore;
 import com.easygame.repository.GameScoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,19 +18,16 @@ import java.util.List;
 @Service
 public class GameScoreService {
     private final GameScoreRepository gameScoreRepository;
-    private final UserService userService;
 
-
-    public void saveScore(String resolvedNickName, GameScoreDto gameScoreDto) throws Exception {
+    public void saveScore(GameScoreDto gameScoreDto) throws Exception {
         if(!isValidRangeOfScore(gameScoreDto.getScore())) {
             throw new IllegalArgumentException("Invalid score range");
         }
 
-        UserDto userDto = validateScoreSubmission(resolvedNickName, gameScoreDto);
-
         gameScoreRepository.save(GameScore.builder()
-                .userId(userDto.getUserId())
                 .score(gameScoreDto.getScore())
+                .nickName(gameScoreDto.getNickName())
+                .jti(gameScoreDto.getJti())
                 .gameType(GameType.from(gameScoreDto.getGameTypeStr()))
                 .build()
         );
@@ -39,23 +35,13 @@ public class GameScoreService {
 
     public List<GameScoreDto> getTop10ByGameType(GameScoreDto gameScoreDto) {
         if(!isValidRangeOfTopScore(gameScoreDto.getTop())) {
-            throw new IllegalArgumentException("invalid range");
+            throw new IllegalArgumentException("Invalid range");
         }
 
         return getRankedScores(gameScoreRepository.findByGameType(gameScoreDto.getGameType(),
                         PageRequest.of(0, gameScoreDto.getTop(), Sort.by(Sort.Direction.DESC, "score"))
                 )
         );
-    }
-
-    private UserDto validateScoreSubmission(String resolvedNickName, GameScoreDto gameScoreDto) throws Exception {
-        UserDto userDto = userService.getOrThrow(resolvedNickName);
-
-        if(!userDto.getNickName().equals(gameScoreDto.getNickName())) {
-            throw new IllegalArgumentException("illegal access user");
-        }
-
-        return userDto;
     }
 
     private boolean isValidRangeOfTopScore(int top) {
@@ -68,13 +54,15 @@ public class GameScoreService {
 
     // When multiple players have the same score, the next rank is incremented accordingly.
     // can do with AtomicInteger
-    private List<GameScoreDto> getRankedScores(List<GameScore> scores) {
+//    private List<GameScoreDto> getRankedScores(List<GameScoreOld> scores) {
+        private List<GameScoreDto> getRankedScores(List<GameScore> scores) {
         List<GameScoreDto> rankedScores = new ArrayList<>();
 
         int rank = 1;
         int prevScore = -1;
 
         for (int i = 0; i < scores.size(); i++) {
+            //GameScoreOld score = scores.get(i);
             GameScore score = scores.get(i);
             int currentScore = score.getScore();
 
@@ -84,7 +72,7 @@ public class GameScoreService {
 
             rankedScores.add(GameScoreDto.builder()
                     .rank(rank)
-                    .nickName(score.getUser().getNickName())
+                    .nickName(score.getNickName())
                     .score(currentScore)
                     .gameTypeStr(score.getGameType().name())
                     .build());

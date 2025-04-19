@@ -1,6 +1,5 @@
 package com.easygame.api.request;
 
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,13 +7,15 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserSaveRequest {
-    private String nickName;
+public class GameScoreSaveTokenRequest {
     private String gameType;
+    private String jti;
+    private int score;
 
     @Builder
-    public UserSaveRequest(String nickName, String gameType) {
-        this.nickName = nickName;
+    public GameScoreSaveTokenRequest(String gameType, String jti, int score) {
         this.gameType = gameType;
+        this.jti = jti;
+        this.score = score;
     }
 }

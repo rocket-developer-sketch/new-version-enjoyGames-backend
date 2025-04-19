@@ -8,23 +8,23 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/q/score")
-@Tag(name = "Game Score API", description = "Game Score API")
+@Tag(name = "Public Query API - Game Score", description = "Handles all GET endpoints related to game scores")
 @RequiredArgsConstructor
-public class QueryGameScoreController {
+public class QueryGameScoreController extends BaseController {
+
     private final GameScoreService gameScoreService;
     private final GameScoreTopMapper gameScoreTopMapper;
 
-    @Tag(name = "Game Score API")
-    @Operation(summary = "Show Top 10", description = "query top 10")
+    @Operation(
+            summary = "Retrieve Top 10 Game Scores",
+            description = "Returns the top 10 game scores sorted in descending order."
+    )
     @GetMapping("/top")
     public ResponseEntity<List<GameScoreTopResponse>> getTopScores(@RequestParam String gameType, @RequestParam int top) {
         return ResponseEntity.ok(gameScoreService.getTop10ByGameType(
@@ -42,6 +42,7 @@ public class QueryGameScoreController {
                         .build())
                 .toList());
     }
+
 
 //    @GetMapping("/test")
 //    public void testLog() {

@@ -135,6 +135,59 @@ docker compose down
 
 ---
 
+
+## 🎯 Score Submission Flow / 점수 제출 흐름
+
+### 🔐Security Architecture / 보안 구조
+
+- User Authentication: JWT-based authentication
+- Score Tampering Prevention: HMAC-based signature using `nickName`, `score`, and `jti` → `signedToken`
+- Duplicate Submission Protection: Redis-based `jti` tracking with TTL (Time-to-Live)
+
+### ✅ Integration Flow (with Filters) / 테스트 흐름
+
+```
+┌────────────────────────────────────┐
+│          Register User             │
+│     POST /api/v1/user/token        │
+└─────────────┬──────────────────────┘
+              │
+              ▼
+     Issues JWT and jti (UUID)
+              │
+              ▼
+┌────────────────────────────────────┐
+│      Request Score Token           │
+│     POST /api/v1/token/scores      │
+│  ▸ JwtAuthenticationFilter         │
+│    → Validates JWT                 │
+│  ▸ Generates signedToken (HMAC)    │
+└─────────────┬──────────────────────┘
+              │
+              ▼
+┌────────────────────────────────────┐
+│         Submit Score               │
+│         POST /api/v1/scores        │
+│  ▸ JwtAuthenticationFilter         │
+│    → Validates JWT                 │
+│  ▸ JwtScoreValidationFilter        │
+│    → Verifies jti & signedToken    │
+│    → Prevents duplicate submission │
+└─────────────┬──────────────────────┘
+              │
+              ▼
+     Saves score and removes jti from Redis
+
+```
+
+### 🧪  Integration Test Execution / 테스트 실행
+
+```bash
+./gradlew :api:test --tests "com.easygame.api.integration.ScoreSubmissionFlowTest"
+```
+
+---
+
 ## 🚧 Todos
 
 ### Deployment / 배포

@@ -1,5 +1,6 @@
 package com.easygame.repository;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -15,6 +16,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @DataJpaTest
+@Transactional
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {RepositoryTestConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)

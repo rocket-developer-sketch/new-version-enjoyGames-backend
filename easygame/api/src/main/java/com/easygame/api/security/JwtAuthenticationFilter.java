@@ -1,7 +1,9 @@
-package com.easygame.api;
+package com.easygame.api.security;
 
-import com.easygame.api.configuration.AuthProperties;
+import com.easygame.api.configuration.FilterPathsProperties;
 import com.easygame.api.response.ErrorCode;
+import com.easygame.api.response.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,22 +12,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-    private final JwtTokenUtil jwtTokenUtil;
-    private final AuthProperties authProperties;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisProvider redisProvider;
+    private final FilterPathsProperties filterPathsProperties;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil, AuthProperties authProperties) {
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.authProperties = authProperties;
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, RedisProvider redisProvider,
+                                   FilterPathsProperties filterPathsProperties) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.redisProvider = redisProvider;
+        this.filterPathsProperties = filterPathsProperties;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
 
-        boolean isIncluded = authProperties.getIncludePaths().stream()
+        boolean isIncluded = filterPathsProperties.getAuthPath().getIncludePaths().stream()
                 .anyMatch(pattern -> pathMatcher.match(pattern, uri));
 
         if (!isIncluded) {
@@ -47,16 +51,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
 
         try {
-            String token = jwtTokenUtil.getNickNameByResolvedToken(header); // parsing
-            Authentication auth = jwtTokenUtil.getAuthentication(token); // auth create
-            SecurityContextHolder.getContext().setAuthentication(auth); // save auth
+            String jti = jwtTokenProvider.getJti(header);
+            String nickName = jwtTokenProvider.getNickName(header);
+            String gameType = jwtTokenProvider.getGameType(header);
+
+            redisProvider.isRegisteredAuthenticationJti(gameType, nickName, jti);
+
+            Authentication auth = jwtTokenProvider.getAuthentication(gameType, jti, nickName);
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
             log.error("API Authentication Exception : {}", e.getMessage(), e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(ErrorCode.INVALID_TOKEN.getMessage());
-            return;
+            objectMapper.writeValue(response.getWriter(), new ErrorResponse(ErrorCode.INVALID_TOKEN));
         }
-
-        filterChain.doFilter(request, response);
     }
 }

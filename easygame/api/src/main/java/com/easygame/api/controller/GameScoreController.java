@@ -1,48 +1,46 @@
 package com.easygame.api.controller;
 
-import com.easygame.api.JwtTokenUtil;
-import com.easygame.api.RedisUtil;
 import com.easygame.api.mapper.GameScoreSaveMapper;
-import com.easygame.api.mapper.GameScoreTopMapper;
 import com.easygame.api.request.GameScoreSaveRequest;
-import com.easygame.api.request.GameScoreTopRequest;
-import com.easygame.api.response.GameScoreTopResponse;
+import com.easygame.api.response.ApiResponse;
+import com.easygame.api.security.CustomUserDetails;
+import com.easygame.api.security.RedisProvider;
 import com.easygame.service.GameScoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/scores")
-@Tag(name = "Game Score API", description = "Game Score API")
+@Tag(name = "Game Score API", description = "Step 3 – submit and save the game score")
 @RequiredArgsConstructor
-public class GameScoreController {
-    //private static final Logger log = LoggerFactory.getLogger(GameScoreController.class);
-
+public class GameScoreController extends BaseController {
     private final GameScoreService gameScoreService;
     private final GameScoreSaveMapper gameScoreSaveMapper;
-    private final JwtTokenUtil jwtTokenUtil;
-    private final RedisUtil redisUtil;
+    private final RedisProvider redisProvider;
 
-    @Tag(name = "Game Score API")
-    @Operation(summary = "Save User's Game Score", description = "save user's game score and nickname. authorization: Bearer <token>")
-    @PostMapping("/user")
-    public ResponseEntity<Void> saveScore(@RequestBody GameScoreSaveRequest gameScoreSaveRequest,
-                                          @RequestHeader(name = "Authorization") String token) throws Exception {
-        if (!redisUtil.isDuplicateSubmission(gameScoreSaveRequest.getNickName(), gameScoreSaveRequest.getGameType())) {
+    @Operation(
+            summary = "Submit and save the user's game score",
+            description = "Validates the authentication token and the signed token before saving the game score securely."
+    )
+    @PostMapping()
+    public ResponseEntity<ApiResponse<Void>> saveScore(@RequestBody GameScoreSaveRequest gameScoreSaveRequest,
+                                                                   @RequestHeader(name = "Authorization") String token) throws Exception {
             gameScoreService.saveScore(
-                    jwtTokenUtil.getNickNameByResolvedToken(token),
                     gameScoreSaveMapper.toDto(gameScoreSaveRequest)
             );
+
+        CustomUserDetails customUserDetails = getAuthentication();
+        if(customUserDetails != null) {
+            String jti = customUserDetails.getUsername();
+            redisProvider.deleteJtiForAuthentication(gameScoreSaveRequest.getGameType(), jti, customUserDetails.getNickName());
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(responseSuccess(null));
     }
 
 }

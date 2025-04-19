@@ -48,7 +48,10 @@ subprojects {
         compileOnly 'org.projectlombok:lombok:1.18.38'
         annotationProcessor 'org.projectlombok:lombok:1.18.38'
         testImplementation 'org.springframework.boot:spring-boot-starter-test:3.4.4'
-        testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.1'
+    // ⚠️ JUnit Platform 1.12.1 causes runtime crash with current Gradle version.
+    //    Requires Gradle 8.4 or higher for compatibility.
+    //    To avoid ClassNotFoundException and TestLauncher errors, we fallback to 1.11.4.
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
     }
 
     test {

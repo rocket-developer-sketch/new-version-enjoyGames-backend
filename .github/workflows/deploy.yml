@@ -22,8 +22,8 @@ jobs:
           script: |
             cd /data/dev/backend
             git pull origin dev/api
-            
-            cd /data/easygame
             ./gradlew :api:bootJar
+                        
+            cd /data/easygame
             docker compose down
             docker compose up --build -d

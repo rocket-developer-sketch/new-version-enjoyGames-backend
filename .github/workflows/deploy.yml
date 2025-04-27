@@ -20,7 +20,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.DEV_SSH }}
           script: |
-            cd /data/application/backend
+            cd /data/dev/backend
             git pull origin dev/api
             
             cd /data/easygame

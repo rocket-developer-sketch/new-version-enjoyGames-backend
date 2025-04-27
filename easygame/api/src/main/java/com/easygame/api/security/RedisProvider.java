@@ -53,7 +53,7 @@ public class RedisProvider {
         String redisKey = makeAuthKey(gameType, jti, URLEncoder.encode(nickName, StandardCharsets.UTF_8));
 
         if (Boolean.FALSE.equals(redisTemplate.hasKey(redisKey))) {
-            throw new InvalidTokenException("Token is not authenticated");
+            throw new InvalidTokenException("Cannot find token");
         }
     }
 

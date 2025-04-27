@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Map;
 
 public class JwtScoreValidationFilter  extends OncePerRequestFilter {
     private final Logger log = LoggerFactory.getLogger(JwtScoreValidationFilter.class);
@@ -63,8 +65,9 @@ public class JwtScoreValidationFilter  extends OncePerRequestFilter {
 
         long contentLength = request.getContentLengthLong(); 
         if (contentLength != -1 && contentLength > MAX_SIZE_BYTES) { // CustomBodyRequestWrapper 한 번에 많은 용량 메모리에 올리기 방지
-            response.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, "Payload too large");
-            return;
+            //response.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, "Payload too large");
+            //return;
+            throw new RuntimeException("Payload too large");
         }
 
         // Apply wrapper to cache the request body for validation,
@@ -97,11 +100,26 @@ public class JwtScoreValidationFilter  extends OncePerRequestFilter {
             filterChain.doFilter(wrappedRequest, response);
         } catch (Exception e) {
             log.error("API Score Token Submission Exception : {}", e.getMessage(), e);
+
+            cachingTriggerForRequest(request);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            objectMapper.writeValue(response.getWriter(), new ErrorResponse(ErrorCode.INVALID_TOKEN));
+            response.getWriter().write(objectMapper.writeValueAsString(new ErrorResponse(ErrorCode.INVALID_TOKEN)));
+            response.flushBuffer();
         }
     }
 
+    public void cachingTriggerForRequest(HttpServletRequest request) {
+        try {
+            // Read body once to trigger caching (for logging filter)
+            new BufferedReader(new InputStreamReader(request.getInputStream()))
+                    .lines().reduce("", (acc, cur) -> acc + cur);
+        } catch (IOException ex) {
+            log.warn("Failed to read request body in auth filter: {}", ex.getMessage());
+        }
+    }
 
     /**
      * // Inner class: Wraps the request to make the body reusable across filters and controllers

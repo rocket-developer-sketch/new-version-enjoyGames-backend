@@ -20,7 +20,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.DEV_SSH }}
           script: |
-            cd /data/dev/backend
+            cd /data/dev/backend/new-version-enjoyGames-backend
             git pull origin dev/api
             ./gradlew :api:bootJar
                         

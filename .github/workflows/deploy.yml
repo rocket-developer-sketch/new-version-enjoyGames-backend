@@ -27,6 +27,8 @@ jobs:
             chmod +x gradlew          
             ./gradlew :api:bootJar
                         
+            cp api/build/libs/*SNAPSHOT.jar /data/easygame/api.jar
+            
             cd /data/easygame
             docker compose down
             docker compose up --build -d

@@ -24,6 +24,7 @@ jobs:
             git pull origin dev/api
 
             cd easygame
+            chmod +x gradlew          
             ./gradlew :api:bootJar
                         
             cd /data/easygame

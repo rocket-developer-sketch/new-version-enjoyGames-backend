@@ -19,6 +19,13 @@ Built with **Spring Boot**, this RESTful API server adopts a **multi-module arch
 
 ---
 
+
+🚧 Development in Progress
+This branch (dev/api) is currently under active development.
+
+
+---
+
 ## 📌 Tech Stack / 주요 기술 스택
 
 - **Language & Framework**: Java 17, Spring Boot 3  

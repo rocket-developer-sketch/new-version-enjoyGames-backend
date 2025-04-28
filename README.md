@@ -21,11 +21,11 @@ Built with **Spring Boot**, this RESTful API server adopts a **multi-module arch
 
 ## 📌 Tech Stack / 주요 기술 스택
 
-- **Language & Framework**: Java 17, Spring Boot 3
-- **Database**: MySQL 8, Redis
-- **Build Tool**: Gradle (Multi-module structure) / 멀티 모듈 구조
-- **Testing**: JUnit 5, Mockito
-- **DevOps**: Docker
+- **Language & Framework**: Java 17, Spring Boot 3  
+- **Database**: MySQL 8, Redis  
+- **Build Tool**: Gradle (Multi-module structure) / 멀티 모듈 구조  
+- **Testing**: JUnit 5, Mockito  
+- **DevOps**: Docker, EC2, Github Actions  
 
 ---
 
@@ -203,7 +203,8 @@ CREATE TABLE `game_scores` (
 
 ### Deployment / 배포
 
-- [] Deploy to AWS EC2 and RDS / AWS EC2 및 RDS 배포 예정
+- [x] Deploy to AWS EC2 using Docker / AWS EC2 Docker 로 배포
+- [] Build succeeded with GitHub Actions, but resolving automatic deployment issue due to AWS CPU shortage.
 - [] Separate Spring Boot profiles for test and production environments / 배포 환경별 프로파일 분리 예정
 
 ### Auth & Validation / 인증 및 검증

@@ -2,6 +2,7 @@ package com.easygame.api.controller;
 
 import com.easygame.api.mapper.GameScoreTopMapper;
 import com.easygame.api.request.GameScoreTopRequest;
+import com.easygame.api.response.ApiResponse;
 import com.easygame.api.response.GameScoreTopResponse;
 import com.easygame.service.GameScoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/q/score")
+@RequestMapping("/api/v1/q/scores")
 @Tag(name = "Public Query API - Game Score", description = "Handles all GET endpoints related to game scores")
 @RequiredArgsConstructor
 public class QueryGameScoreController extends BaseController {
@@ -26,8 +27,8 @@ public class QueryGameScoreController extends BaseController {
             description = "Returns the top 10 game scores sorted in descending order."
     )
     @GetMapping("/top")
-    public ResponseEntity<List<GameScoreTopResponse>> getTopScores(@RequestParam String gameType, @RequestParam int top) {
-        return ResponseEntity.ok(gameScoreService.getTop10ByGameType(
+    public ResponseEntity<ApiResponse<List<GameScoreTopResponse>>> getTopScores(@RequestParam String gameType, @RequestParam int top) {
+        return ResponseEntity.ok(responseSuccess(gameScoreService.getTop10ByGameType(
                         gameScoreTopMapper.toDto(GameScoreTopRequest.builder()
                                 .gameType(gameType)
                                 .top(top)
@@ -40,7 +41,7 @@ public class QueryGameScoreController extends BaseController {
                         .rank(it.getRank())
                         .gameType(it.getGameTypeStr())
                         .build())
-                .toList());
+                .toList()));
     }
 
 

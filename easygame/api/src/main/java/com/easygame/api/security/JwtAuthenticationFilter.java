@@ -1,6 +1,7 @@
 package com.easygame.api.security;
 
 import com.easygame.api.configuration.FilterPathsProperties;
+import com.easygame.api.exception.InvalidAuthentication;
 import com.easygame.api.response.ErrorCode;
 import com.easygame.api.response.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,8 +15,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
@@ -64,8 +70,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             log.error("API Authentication Exception : {}", e.getMessage(), e);
+
+            cachingTriggerForRequest(request);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            objectMapper.writeValue(response.getWriter(), new ErrorResponse(ErrorCode.INVALID_TOKEN));
+            response.getWriter().write(objectMapper.writeValueAsString(new ErrorResponse(ErrorCode.INVALID_TOKEN)));
+            response.flushBuffer();
+        }
+    }
+
+    public void cachingTriggerForRequest(HttpServletRequest request) {
+        try {
+            // Read body once to trigger caching (for logging filter)
+            new BufferedReader(new InputStreamReader(request.getInputStream()))
+                    .lines().reduce("", (acc, cur) -> acc + cur);
+        } catch (IOException ex) {
+            log.warn("Failed to read request body in auth filter: {}", ex.getMessage());
         }
     }
 }

@@ -1,0 +1,34 @@
+name: Deploy to EC2 on dev/api Push
+
+on:
+  push:
+    branches:
+      - dev/api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.DEV_SERVER }}
+          username: ubuntu
+          key: ${{ secrets.DEV_SSH }}
+          script: |
+            cd /data/dev/backend/new-version-enjoyGames-backend
+            git pull origin dev/api
+
+            cd easygame
+            chmod +x gradlew          
+            ./gradlew :api:bootJar
+                        
+            cp api/build/libs/*SNAPSHOT.jar /data/easygame/api.jar
+            
+            cd /data/easygame
+            docker compose down
+            docker compose up --build -d

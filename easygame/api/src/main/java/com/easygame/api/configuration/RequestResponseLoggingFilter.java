@@ -1,5 +1,8 @@
 package com.easygame.api.configuration;
 
+import com.easygame.api.response.ErrorCode;
+import com.easygame.api.response.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,11 +14,13 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 
 //public class RequestResponseLoggingFilter implements Filter {
 public class RequestResponseLoggingFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(RequestResponseLoggingFilter.class);
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -24,14 +29,18 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
         ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper((HttpServletRequest) request);
         ContentCachingResponseWrapper wrappedResponse = new ContentCachingResponseWrapper((HttpServletResponse) response);
 
-        filterChain.doFilter(wrappedRequest, wrappedResponse); // execute
+        try {
+            filterChain.doFilter(wrappedRequest, wrappedResponse); // execute
+        } catch (Exception e) {
+            log.debug("Filter exception : {}", e.getMessage(), e);
+        } finally {
+            // logging
+            logRequest(wrappedRequest);
+            logResponse(wrappedResponse);
 
-        // logging
-        logRequest(wrappedRequest);
-        logResponse(wrappedResponse);
-
-        // response를 클라이언트로 전달하기 위해 반드시 복사
-        wrappedResponse.copyBodyToResponse();
+            // Must copy the response body to ensure it's sent to the client
+            wrappedResponse.copyBodyToResponse();
+        }
     }
 
     private void logRequest(ContentCachingRequestWrapper request) throws IOException {
@@ -41,12 +50,12 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
         log.info("[REQUEST] {} {}", method, uri);
 
-        // Body 출력
+        // Body
         if (!body.isBlank()) {
             log.debug("Request Body: {}", body);
         }
 
-        // Query Parameter 출력
+        // Query Parameter
         Map<String, String[]> params = request.getParameterMap();
         if (!params.isEmpty()) {
             params.forEach((key, value) -> {

@@ -37,7 +37,7 @@ public class GameScoreController extends BaseController {
         CustomUserDetails customUserDetails = getAuthentication();
         if(customUserDetails != null) {
             String jti = customUserDetails.getUsername();
-            redisProvider.deleteJtiForAuthentication(gameScoreSaveRequest.getGameType(), jti, customUserDetails.getNickName());
+            redisProvider.deleteJtiForAuthentication(customUserDetails.getGameType(), jti, customUserDetails.getNickName());
         }
 
         return ResponseEntity.ok(responseSuccess(null));
